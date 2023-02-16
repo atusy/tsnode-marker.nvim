@@ -18,7 +18,7 @@ require("lazy").setup({
     filetype = "markdown",
     init = function()
       vim.api.nvim_create_autocmd("FileType", {
-        group = utils.augroup,
+        group = vim.api.nvim_create_augroup("tsnode-marker-markdown", {}),
         pattern = "markdown",
         callback = function(ctx)
           require("tsnode-marker").set_automark(ctx.buf, {
