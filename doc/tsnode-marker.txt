@@ -1,0 +1,201 @@
+*tsnode-marker.txt*    Mark treesitter nodes to enhance context changes in your buffer
+*tsnode-marker.nvim*
+
+Author: atusy
+License: MIT <https://github.com/atusy/tsnode-marker.nvim/blob/main/LICENSE>
+
+
+==============================================================================
+CONTENTS                                              *tsnode-marker-contents*
+
+MODULES AND FUNCTIONS                    |tsnode-marker-modules-and-functions|
+  tsnode-marker                          |tsnode-marker|
+  tsnode-marker.indent                   |tsnode-marker.indent|
+  tsnode-marker.mark                     |tsnode-marker.mark|
+  tsnode-marker.tsnode                   |tsnode-marker.tsnode|
+FUNCTION PARAMETERS                      |tsnode-marker-function-parameters|
+  Opts_automark                          |tsnode-marker-opts-automark|
+  Opts_mark                              |tsnode-marker-opts-mark|
+
+
+
+==============================================================================
+INSTALL AND SETUP
+
+Install and setup automatic background coloring on code blocks in Markdown
+documents with |lazy.nvim.txt| from https://github.com/folke/lazy.nvim/
+
+>lua
+  require("lazy").setup({
+    {
+      "atusy/tsnode-marker.nvim",
+      lazy = true,
+      filetype = "markdown",
+      init = function()
+        vim.api.nvim_create_autocmd("FileType", {
+          group = vim.api.nvim_create_augroup("tsnode-marker-markdown", {}),
+          pattern = "markdown",
+          callback = function(ctx)
+            require("tsnode-marker").set_automark(ctx.buf, {
+              target = { "code_fence_content" }, -- list of target node types
+              hl_group = "CursorLine", -- highlight group
+            })
+          end,
+        })
+      end,
+    },
+  }, {})
+<
+
+==============================================================================
+MODULES AND FUNCTIONS                    *tsnode-marker-modules-and-functions*
+
+
+------------------------------------------------------------------------------
+tsnode-marker                            *tsnode-marker*
+
+This module provides some basic functions.
+
+
+                                         *tsnode-marker.set_automark()*
+set_automark({buf}, {opts})
+  Set |autocmd| to a {buf} so that visible nodes matching {opts.is_target} are
+  automatically marked in response to text changes, window scrolls and window
+  resizes. The matched nodes are processed by
+  |tsnode-marker.mark.mark_node_in_range()|.
+
+
+                                         *tsnode-marker.unset_automark()*
+unset_automark({buf})
+  Unset |autocmd| and clear internal namespaces from a {buf} or all buffers
+  if {buf} is nil.
+
+
+------------------------------------------------------------------------------
+tsnode-marker.indent                     *tsnode-marker.indent*
+
+This module provides some helper functions to measure indent levels taking
+into account of |'tabstop'|.
+
+
+                                       *tsnode-marker.indent.measure_indent()*
+measure_indent({line}, {tabstop})
+  Measure an indent width of a line.
+
+  Parameters:
+    - {line}    string.
+    - {tabstop} |'tabstop'|
+
+  Retruns: number
+
+
+                                *tsnode-marker.indent.measure_common_indent()*
+measure_common_indent({line}, {tabstop})
+  Measure a common indent width of lines.
+
+  Parameters:
+    - {line}    string.
+    - {tabstop} |'tabstop'|
+
+  Retruns: number
+
+
+------------------------------------------------------------------------------
+tsnode-marker.mark                       *tsnode-marker.mark*
+
+This module provides core functionality of |tsnode-marker.nvim|.
+
+                                         *tsnode-marker.mark.mark_node()*
+mark_node({buf}, {node}, {opts})
+  Mark a node formatted by {opts.hl_group}, {opts.indent}, {opts.priority}
+
+  Parameters:  
+    - {buf}  Buffer handle, or 0 for current buffer
+    - {node} Treesitter node
+    - {opts} Options |tsnode-marker-opts-mark|  
+
+
+                                     *tsnode-marker.mark.mark_node_in_range()*
+mark_nodes_in_range({buf}, {opts})
+  Mark nodes that matches {opts.is_target}. Target nodes are passed to
+  |tsnode-marker.mark.mark_node()|
+
+  Parameters:  
+    - {buf}  Buffer handle, or 0 for current buffer
+    - {opts} Options |tsnode-marker-opts-mark|  
+
+
+------------------------------------------------------------------------------
+tsnode-marker.tsnode                     *tsnode-marker.tsnode*
+
+This module provides some helper functions to deal with |tsnode|.
+
+
+                                     *tsnode-marker.tsnode.get_first_in_range*
+get_first_in_range({buf}, {start_row}, {end_row})
+  Get first |tsnode| in a given range of lines in {buf}.
+
+  Parameters:  
+    - {buf}       Buffer handle, or 0 for current buffer
+    - {start_row} A line number to start finding a node. 
+    - {end_row}   A line number to end finding a node. 
+
+  Return: |tsnode|
+
+list_parents({node})
+  List parent |tsnode| and {node} itself.
+
+  Parameters:  
+    {node}: |tsnode|
+
+  Returns: List of |tsnode|
+
+
+==============================================================================
+FUNCTION PARAMETERS                      *tsnode-marker-function-parameters*
+
+Parameters commonly used in functions described in
+|tsnode-marker-modules-and-functions|.
+
+------------------------------------------------------------------------------
+Opts_automark                            *tsnode-marker-opts-automark*
+
+A table with following fields:
+
+{target} string[] | fun(buf: number, node: tsnode): boolean
+  Determines if node is a marking target by examining
+    - {string[]} contains node type (|tsnode:type()|)
+    - {fun} returns true
+
+{hl_group} string | fun(buf: number, node: tsnode): string
+  String or function that indicates the applying highlight group on
+  the marked regions
+
+{indent} "node" | "none" | fun(buf: number, node: tsnode): number
+  Strategies to determine indent levels of the marked regions:
+    - {"none"} or nil indicates 0
+    - {"node"} finds common indent width from the node
+    - {fun} returns a number of the indent width.
+  Note that |tsnode-marker.indent| module provides some helper functions.
+
+{priority} number | nil
+  Interger indicating the priority of extmarks applied by tsnode-marker.
+  Default is 1. Note that virtual texts may applie with priority + 1 to mimic
+  indent levels of other lines in the same node.
+  See |vim_buf_set_extmark()| for the details.
+
+
+------------------------------------------------------------------------------
+Opts_mark                                *tsnode-marker-opts-mark* 
+
+A table extending Opts_automark (|tsnode-marker-opts-automark|)
+with following fields:
+
+{namespace} number
+  A namespace where marking applies. See |nvim_create_namespace()|.
+{start_row} number
+  A number indicating starting row of a range in
+  |tsnode-marker.mark.mark_node_in_range()|.
+{end_row} number
+  A number indicating ending row of a range in
+  |tsnode-marker.mark.mark_node_in_range()|.
