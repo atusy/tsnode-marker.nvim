@@ -3,6 +3,7 @@ local M = {}
 ---@param line string
 ---@param tabstop number
 ---@return number
+---measure indent lengths of a line considering tabstop
 local function measure_indent(line, tabstop)
   local n = 0
   for l in string.gmatch(line, ".") do
@@ -20,6 +21,7 @@ end
 ---@param lines string[]
 ---@param tabstop number
 ---@return number
+---measure common indent lengths of lines considering tabstop
 function M.measure_common_indent(lines, tabstop)
   local counts = {}
   for _, l in pairs(lines) do

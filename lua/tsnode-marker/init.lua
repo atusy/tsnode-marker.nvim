@@ -51,6 +51,7 @@ local function name_automark(buf)
   return "tsnode-marker-automark-augroup-" .. tostring(buf)
 end
 
+---@param buf number
 local function clear_namespaces(buf)
   for _, ns in pairs(NAMESPACES) do
     vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
@@ -58,6 +59,7 @@ local function clear_namespaces(buf)
 end
 
 ---@param buf number?
+---unset automatic marking by removing autocmd and clearing namespaces
 function M.unset_automark(buf)
   local buflist = buf == nil and vim.api.nvim_list_bufs() or { buf }
   for _, b in pairs(buflist) do
@@ -70,6 +72,8 @@ end
 
 ---@param buf number
 ---@param opts Opts_automark
+---set automatic marking on visible nodes in response to text changes,
+---window scrolls and window resizes
 function M.set_automark(buf, opts)
   local first_row = vim.fn.getpos("w0")[2] - 1
   local last_row = vim.fn.getpos("w$")[2] - 1

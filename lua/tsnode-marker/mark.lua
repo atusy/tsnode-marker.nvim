@@ -3,12 +3,20 @@
 ---@field start_row? number
 ---@field end_row? number
 
+---@class Opts_fixed: Opts_mark
+---@field start_row number
+---@field end_row number
+---@field indent fun(buf: number, node: Tsnode): number
+---@field priority number
+---@field target fun(buf: number, node: Tsnode): boolean
+
 local M = {}
 
 ---@param line string
 ---@param indent number
 ---@param tabstop number
 ---@return number
+---finds start column for extmark on a line
 local function find_start_col(line, indent, tabstop)
   local start_col = 0
   local start_pos = 0
@@ -34,7 +42,8 @@ end
 ---@param lines string[]
 ---@param tabstop number
 ---@param opts Opts_mark
-local function _indent(buf, node, lines, tabstop, opts)
+---measures indent of a node respecting opts.indent
+local function measure_node_indent(buf, node, lines, tabstop, opts)
   local o = opts.indent
   if o == nil or o == "node" then
     return require("tsnode-marker.indent").measure_common_indent(lines, tabstop)
@@ -48,11 +57,13 @@ end
 ---@param buf number
 ---@param node userdata
 ---@param opts Opts_mark
+---sets highlight group on a node respecting its indent
+---and sets virtual text to fix apparent outdenting on blanklines
 function M.mark_node(buf, node, opts)
   local range = { node:range() }
   local lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
   local tabstop = vim.api.nvim_buf_get_option(buf, "tabstop")
-  local indent = _indent(buf, node, lines, tabstop, opts)
+  local indent = measure_node_indent(buf, node, lines, tabstop, opts)
 
   for i, line in pairs(lines) do
     local start_col = find_start_col(line, indent, tabstop)
@@ -88,6 +99,10 @@ end
 ---@param buf number
 ---@param node Tsnode
 ---@return string[]
+---list captures from the first position of a node
+---
+---NOTE: should actually be a part of tsnode, however, it sits here unexported
+---      because this function is used by an experimental feature.
 local function get_captures(buf, node)
   local row, col, _, _ = node:range()
   local captures = vim.treesitter.get_captures_at_pos(buf, row, col + 1)
@@ -102,6 +117,7 @@ end
 ---@param node Tsnode
 ---@param opts Opts_mark
 ---@return boolean
+---tests if node is a target to be marked
 local function is_target(buf, node, opts)
   local _target = opts.target
   if _target == nil then
@@ -121,6 +137,8 @@ end
 ---@param node Tsnode
 ---@param opts Opts_mark
 ---@return nil
+---recursively marks children of a node if it satisfies opts.target and
+---if children overlaps with the range opts.start_row to opts.end_row
 local function mark_children(buf, node, opts)
   for k in node:iter_children() do
     if is_target(buf, k, opts) then
@@ -138,6 +156,8 @@ end
 ---@param node Tsnode
 ---@param opts Opts_mark
 ---@return nil
+---marks next siblings of a node if it satisifies opts.target
+---if the siblings overlaps with the range opts.start_row to opts.end_row
 local function mark_next_sibling(buf, node, opts)
   local n = node
   while true do
@@ -159,6 +179,11 @@ end
 ---@param buf number
 ---@param opts Opts_mark
 ---@return nil
+---marks nodes if they satisfy opts.target and 
+---if they overlaps with the range opts.start_row to opts.end_row
+---
+---in order to avoid meaningless overlaying,
+---marks applies in descending order from the root of a tree
 function M.mark_nodes_in_range(buf, opts)
   if not opts.start_row or not opts.end_row then
     opts = vim.deepcopy(opts)

@@ -18,6 +18,7 @@ end
 ---@param start_row number
 ---@param end_row number
 ---@return Tsnode?
+---get a first node in the range
 function M.get_first_in_range(buf, start_row, end_row)
   local node
   for row = start_row, end_row do
@@ -30,6 +31,8 @@ end
 
 ---@param node Tsnode
 ---@return Tsnode[]
+---lists parent nodes and itself
+---i.e. { node, node:parent(), node:parent():parent(), ... }
 function M.list_parents(node)
   local list = {}
   local parent = node
