@@ -1,7 +1,7 @@
 ---@alias Tsnode userdata should actually be tsnode|under|userdata
 
 ---@class Opts_automark
----@field target string[] | fun(buf: number, node: Tsnode): boolean
+---@field target? string[] | fun(buf: number, node: Tsnode): boolean
 ---@field hl_group string | fun(buf: number, node: Tsnode): string
 ---@field priority? number
 ---@field indent? "node" | "none" | fun(buf: number, node: Tsnode): number
@@ -74,7 +74,12 @@ function M.set_automark(buf, opts)
   local first_row = vim.fn.getpos("w0")[2] - 1
   local last_row = vim.fn.getpos("w$")[2] - 1
   clear_namespaces(buf)
-  mark(buf, NAMESPACES[current_ns_key], first_row, last_row, opts)
+  vim.schedule(
+    -- make sure callback is evaluated after captures are available
+    function()
+      mark(buf, NAMESPACES[current_ns_key], first_row, last_row, opts)
+    end
+  )
 
   local augroup = vim.api.nvim_create_augroup(name_automark(buf), {})
 

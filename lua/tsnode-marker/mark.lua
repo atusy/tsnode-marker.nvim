@@ -87,10 +87,26 @@ end
 
 ---@param buf number
 ---@param node Tsnode
+---@return string[]
+local function get_captures(buf, node)
+  local row, col, _, _ = node:range()
+  local captures = vim.treesitter.get_captures_at_pos(buf, row, col + 1)
+  local ret = {}
+  for _, c in pairs(captures) do
+    table.insert(ret, c.capture)
+  end
+  return ret
+end
+
+---@param buf number
+---@param node Tsnode
 ---@param opts Opts_mark
 ---@return boolean
 local function is_target(buf, node, opts)
   local _target = opts.target
+  if _target == nil then
+    return vim.tbl_contains(get_captures(buf, node), "tsnodemarker")
+  end
   local _type = type(_target)
   if _type == "function" then
     return _target(buf, node)
