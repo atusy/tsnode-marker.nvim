@@ -3,13 +3,6 @@
 ---@field start_row? number
 ---@field end_row? number
 
----@class Opts_fixed: Opts_mark
----@field start_row number
----@field end_row number
----@field indent fun(buf: number, node: Tsnode): number
----@field priority number
----@field target fun(buf: number, node: Tsnode): boolean
-
 local M = {}
 
 ---@param line string
