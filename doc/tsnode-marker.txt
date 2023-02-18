@@ -64,11 +64,21 @@ set_automark({buf}, {opts})
   resizes. The matched nodes are processed by
   |tsnode-marker.mark.mark_node_in_range()|.
 
+  Parameters: 
+    - {buf}  Buffer handle, or 0 for current buffer
+    - {opts} Options. See |tsnode-marker.Opts_automark| for the details.
+             Note that language parser is resolved with |nvim-treesitter| if
+             available and {opts.lang} is nil.
+
 
                                          *tsnode-marker.unset_automark()*
 unset_automark({buf})
-  Unset |autocmd| and clear internal namespaces from a {buf} or all buffers
-  if {buf} is nil.
+  Unset |autocmd| and clear internal namespaces set by
+  |tsnode-marker.set_automark()|.
+
+  Parameters:
+    - {buf}  Buffer handle, or 0 for current buffer. The nil value indicates
+             all buffers.
 
 
 ------------------------------------------------------------------------------
