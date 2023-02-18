@@ -132,13 +132,15 @@ This module provides some helper functions to deal with |tsnode|.
 
 
                                      *tsnode-marker.tsnode.get_first_in_range*
-get_first_in_range({buf}, {start_row}, {end_row})
+get_first_in_range({buf}, {start_row}, {end_row}, {opts})
   Get first |tsnode| in a given range of lines in {buf}.
 
   Parameters:  
     - {buf}       Buffer handle, or 0 for current buffer
     - {start_row} A line number to start finding a node. 
     - {end_row}   A line number to end finding a node. 
+    - {opts}      A table passed to the {opts} parameter of
+                  |vim.treesitter.get_nod_at_pos|.
 
   Return: |tsnode|
 
