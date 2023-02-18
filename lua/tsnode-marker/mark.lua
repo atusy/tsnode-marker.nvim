@@ -172,7 +172,7 @@ end
 ---@param buf number
 ---@param opts Opts_mark
 ---@return nil
----marks nodes if they satisfy opts.target and 
+---marks nodes if they satisfy opts.target and
 ---if they overlaps with the range opts.start_row to opts.end_row
 ---
 ---in order to avoid meaningless overlaying,
