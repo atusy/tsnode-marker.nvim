@@ -72,11 +72,37 @@ function M.unset_automark(buf)
   end
 end
 
+---@alias get_parser fun(buf?: number, ft?: string, default?: string): string?
+---@type get_parser
+local function _get_lang(_, ft, _)
+  return require("nvim-treesitter.parsers").filetype_to_parsername[ft]
+end
+
+---@type get_parser
+---get language, i.e. parser name, of a buffer with the optional help
+---from nvim-treesitter. The result is further tested if applicable
+---by
+local function get_lang(buf, ft, default)
+  local lang = default
+  if lang == nil then
+    local ok, _lang = pcall(_get_lang, buf, ft, lang)
+    if ok and _lang then
+      lang = _lang
+    end
+  end
+  vim.treesitter.get_parser(buf or 0, lang)
+  return lang
+end
+
 ---@param buf number
 ---@param opts Opts_automark
 ---set automatic marking on visible nodes in response to text changes,
 ---window scrolls and window resizes
 function M.set_automark(buf, opts)
+  local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+  local lang = get_lang(buf, ft, opts.lang)
+  opts = vim.tbl_deep_extend("force", opts, {lang = lang})
+
   local first_row = vim.fn.getpos("w0")[2] - 1
   local last_row = vim.fn.getpos("w$")[2] - 1
   clear_namespaces(buf)
