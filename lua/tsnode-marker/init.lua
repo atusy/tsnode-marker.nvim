@@ -5,6 +5,7 @@
 ---@field hl_group string | fun(buf: number, node: Tsnode): string
 ---@field priority? number
 ---@field indent? "node" | "none" | fun(buf: number, node: Tsnode): number
+---@field lang? string
 
 local M = {}
 
@@ -26,6 +27,7 @@ local function mark(buf, ns, start_row, end_row, opts)
     namespace = ns,
     start_row = start_row,
     end_row = end_row,
+    lang = opts.lang
   })
 end
 
