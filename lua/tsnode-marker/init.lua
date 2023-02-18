@@ -75,7 +75,7 @@ end
 ---@alias get_parser fun(buf?: number, ft?: string, default?: string): string?
 ---@type get_parser
 local function _get_lang(_, ft, _)
-  return require("nvim-treesitter.parsers").filetype_to_parsername[ft]
+  return require("nvim-treesitter.parsers").ft_to_lang(ft)
 end
 
 ---@type get_parser
