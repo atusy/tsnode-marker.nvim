@@ -27,7 +27,7 @@ local function mark(buf, ns, start_row, end_row, opts)
     namespace = ns,
     start_row = start_row,
     end_row = end_row,
-    lang = opts.lang
+    lang = opts.lang,
   })
 end
 
@@ -101,7 +101,7 @@ end
 function M.set_automark(buf, opts)
   local ft = vim.api.nvim_buf_get_option(buf, "filetype")
   local lang = get_lang(buf, ft, opts.lang)
-  opts = vim.tbl_deep_extend("force", opts, {lang = lang})
+  opts = vim.tbl_deep_extend("force", opts, { lang = lang })
 
   local first_row = vim.fn.getpos("w0")[2] - 1
   local last_row = vim.fn.getpos("w$")[2] - 1
