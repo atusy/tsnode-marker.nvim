@@ -72,13 +72,13 @@ function M.unset_automark(buf)
   end
 end
 
----@alias get_parser fun(buf?: number, ft?: string, default?: string): string?
----@type get_parser
+---@alias get_lang fun(buf?: number, ft?: string, default?: string): string?
+---@type get_lang
 local function _get_lang(_, ft, _)
   return require("nvim-treesitter.parsers").ft_to_lang(ft)
 end
 
----@type get_parser
+---@type get_lang
 ---get language, i.e. parser name, of a buffer with the optional help
 ---from nvim-treesitter. The result is further tested if applicable
 ---by
