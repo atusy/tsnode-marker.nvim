@@ -186,6 +186,8 @@ A table with following fields:
   indent levels of other lines in the same node.
   See |vim_buf_set_extmark()| for the details.
 
+{lang} string | nil
+  A language parser name of Treesitter.
 
 ------------------------------------------------------------------------------
 Opts_mark                                *tsnode-marker-opts-mark* 
