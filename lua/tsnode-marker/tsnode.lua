@@ -17,12 +17,13 @@ end
 ---@param buf number
 ---@param start_row number
 ---@param end_row number
+---@param opts table 
 ---@return Tsnode?
 ---get a first node in the range
-function M.get_first_in_range(buf, start_row, end_row)
+function M.get_first_in_range(buf, start_row, end_row, opts)
   local node
   for row = start_row, end_row do
-    node = vim.treesitter.get_node_at_pos(buf, row, 0, {}) --[[@as Tsnode?]]
+    node = vim.treesitter.get_node_at_pos(buf, row, 0, opts) --[[@as Tsnode?]]
     if node and not is_root(buf, node) then
       return node
     end
