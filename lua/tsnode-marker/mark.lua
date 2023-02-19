@@ -190,7 +190,7 @@ function M.mark_nodes_in_range(buf, opts)
     opts.end_row = opts.end_row or (vim.fn.getpos("$") - 1)
   end
   local tsnode = require("tsnode-marker.tsnode")
-  local first_node = tsnode.get_first_in_range(buf, opts.start_row, opts.end_row, {lang = opts.lang})
+  local first_node = tsnode.get_first_in_range(buf, opts.start_row, opts.end_row, { lang = opts.lang })
 
   if first_node == nil then
     return
