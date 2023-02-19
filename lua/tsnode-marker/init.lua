@@ -1,7 +1,7 @@
 ---@alias Tsnode userdata should actually be tsnode|under|userdata
 
 ---@class Opts_automark
----@field target? string[] | fun(buf: number, node: Tsnode): boolean
+---@field target? string[] | fun(buf: number, node: Tsnode): boolean, string?
 ---@field hl_group string | fun(buf: number, node: Tsnode): string
 ---@field priority? number
 ---@field indent? "node" | "none" | fun(buf: number, node: Tsnode): number

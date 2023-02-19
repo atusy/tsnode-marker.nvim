@@ -115,7 +115,7 @@ end
 ---@param buf number
 ---@param node Tsnode
 ---@param opts Opts_mark
----@return boolean
+---@return boolean, string?
 ---tests if node is a target to be marked
 local function is_target(buf, node, opts)
   local _target = opts.target
@@ -140,8 +140,9 @@ end
 ---if children overlaps with the range opts.start_row to opts.end_row
 local function mark_children(buf, node, opts)
   for k in node:iter_children() do
-    if is_target(buf, k, opts) then
-      M.mark_node(buf, k, opts)
+    local ok, hl = is_target(buf, k, opts)
+    if ok then
+      M.mark_node(buf, k, vim.tbl_extend("force", { hl_group = hl }, opts))
     else
       local sr, _, er, _ = k:range()
       if (opts.start_row <= sr and sr <= opts.end_row) or (opts.start_row <= er and er <= opts.end_row) then
@@ -166,8 +167,9 @@ local function mark_next_sibling(buf, node, opts)
     end
     local range = { n:range() }
     if range[1] <= opts.end_row then
-      if is_target(buf, n, opts) then
-        M.mark_node(buf, n, opts)
+      local ok, hl = is_target(buf, n, opts)
+      if ok then
+        M.mark_node(buf, n, vim.tbl_extend("force", { hl_group = hl }, opts))
       else
         mark_children(buf, n, opts)
       end
@@ -197,14 +199,15 @@ function M.mark_nodes_in_range(buf, opts)
   end
 
   local ancestors = tsnode.list_parents(first_node)
-  local ok ---@type boolean
+  local ok, hl ---@type boolean, string?
   for i = #ancestors, 1, -1 do
     if ok then
       return -- avoid meaningless overlays
     end
     local n = ancestors[i]
-    if is_target(buf, n, opts) then
-      M.mark_node(buf, n, opts)
+    ok, hl = is_target(buf, n, opts)
+    if ok then
+      M.mark_node(buf, n, vim.tbl_extend("force", { hl_group = hl }, opts))
     elseif i == 1 then
       mark_children(buf, n, opts)
     end
