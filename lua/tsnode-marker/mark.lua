@@ -63,6 +63,7 @@ function M.mark_node(buf, node, opts)
   if type(hl_group) == "function" then
     hl_group = hl_group(buf, node)
   end
+  local needs_vt = string.match(hl_group .. ".", "^@tsnodemarker%.")
 
   for i, line in pairs(lines) do
     local start_col = find_start_col(line, indent, tabstop)
@@ -83,8 +84,11 @@ function M.mark_node(buf, node, opts)
       priority = priority_hl,
       hl_group = hl_group,
     })
-    if line == "" and indent > 0 then
+    if needs_vt or (line == "" and indent > 0) then
       vim.api.nvim_buf_set_extmark(buf, opts.namespace, start_row, 0, {
+        --- TODO: virt_text should probably composed of charcters respecting listchars
+        ---       Current implementation hides listchars...
+        ---       For blank lines, " " should be okay as it will not overlay other characters.
         virt_text = { { string.rep(" ", indent), "Normal" } },
         virt_text_pos = "overlay",
         virt_text_win_col = 0,
@@ -97,19 +101,16 @@ end
 
 ---@param buf number
 ---@param node Tsnode
----@return string[]
----list captures from the first position of a node
----
----NOTE: should actually be a part of tsnode, however, it sits here unexported
----      because this function is used by an experimental feature.
-local function get_captures(buf, node)
+---@return boolean, string?
+local function capture_tsnodemarker(buf, node)
   local row, col, _, _ = node:range()
   local captures = vim.treesitter.get_captures_at_pos(buf, row, col + 1)
-  local ret = {}
   for _, c in pairs(captures) do
-    table.insert(ret, c.capture)
+    if string.match(c.capture .. ".", "^tsnodemarker%.") then
+      return true, "@" .. c.capture
+    end
   end
-  return ret
+  return false
 end
 
 ---@param buf number
@@ -120,7 +121,7 @@ end
 local function is_target(buf, node, opts)
   local _target = opts.target
   if _target == nil then
-    return vim.tbl_contains(get_captures(buf, node), "tsnodemarker")
+    return capture_tsnodemarker(buf, node) --NOTE: EXPERIMENTAL
   end
   local _type = type(_target)
   if _type == "function" then
