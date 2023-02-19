@@ -57,6 +57,10 @@ function M.mark_node(buf, node, opts)
   local lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
   local tabstop = vim.api.nvim_buf_get_option(buf, "tabstop")
   local indent = measure_node_indent(buf, node, lines, tabstop, opts)
+  local hl_group = opts.hl_group
+  if type(hl_group) == "function" then
+    hl_group = hl_group(buf, node)
+  end
 
   for i, line in pairs(lines) do
     local start_col = find_start_col(line, indent, tabstop)
@@ -75,7 +79,7 @@ function M.mark_node(buf, node, opts)
       end_col = end_col,
       hl_eol = true,
       priority = opts.priority or 1,
-      hl_group = type(opts.hl_group == "string") and opts.hl_group or opts.hl_group(buf, node),
+      hl_group = hl_group,
     })
     if line == "" and indent > 0 then
       vim.api.nvim_buf_set_extmark(buf, opts.namespace, start_row, 0, {
