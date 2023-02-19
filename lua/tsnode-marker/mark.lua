@@ -181,8 +181,8 @@ end
 ---marks nodes if they satisfy opts.target and
 ---if they overlaps with the range opts.start_row to opts.end_row
 ---
----in order to avoid meaningless overlaying,
----marks applies in descending order from the root of a tree
+---in order to avoid meaningless overlays,
+---marks apply in descending order from the root of a tree
 function M.mark_nodes_in_range(buf, opts)
   if not opts.start_row or not opts.end_row then
     opts = vim.deepcopy(opts)
@@ -197,7 +197,11 @@ function M.mark_nodes_in_range(buf, opts)
   end
 
   local ancestors = tsnode.list_parents(first_node)
+  local ok ---@type boolean
   for i = #ancestors, 1, -1 do
+    if ok then
+      return -- avoid meaningless overlays
+    end
     local n = ancestors[i]
     if is_target(buf, n, opts) then
       M.mark_node(buf, n, opts)
