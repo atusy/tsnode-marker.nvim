@@ -57,6 +57,8 @@ function M.mark_node(buf, node, opts)
   local lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
   local tabstop = vim.api.nvim_buf_get_option(buf, "tabstop")
   local indent = measure_node_indent(buf, node, lines, tabstop, opts)
+  local priority_hl = opts.priority or 1
+  local priority_vt = priority_hl + 1
   local hl_group = opts.hl_group
   if type(hl_group) == "function" then
     hl_group = hl_group(buf, node)
@@ -78,7 +80,7 @@ function M.mark_node(buf, node, opts)
       end_row = end_row,
       end_col = end_col,
       hl_eol = true,
-      priority = opts.priority or 1,
+      priority = priority_hl,
       hl_group = hl_group,
     })
     if line == "" and indent > 0 then
@@ -87,7 +89,7 @@ function M.mark_node(buf, node, opts)
         virt_text_pos = "overlay",
         virt_text_win_col = 0,
         virt_text_hide = true,
-        priority = (opts.priority and opts.priority + 1 or 1),
+        priority = priority_vt,
       })
     end
   end
