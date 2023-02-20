@@ -64,13 +64,54 @@ local function mark_diff(buf, start_row, end_row, opts)
 end
 
 ---@param buf number
----@param start_row number
----@param end_row number
+---@return {[1]: number, [2]: number}[]
+local function get_ranges(buf)
+  local wins = vim.fn.win_findbuf(buf)
+  local data = {} ---@type table{number, number}
+  local keys = {} ---@type number[]
+  for _, w in pairs(wins) do
+    vim.api.nvim_win_call(w, function()
+      local sl = vim.fn.getpos("w0")[2] - 1
+      local el = vim.fn.getpos("w$")[2] - 1
+      if not data[sl] or data[sl] < el then
+        data[sl] = el
+        table.insert(keys, sl)
+      end
+    end)
+  end
+  table.sort(keys)
+
+  if #keys == 0 then
+    return {}
+  end
+
+  local res = { { keys[1], data[keys[1]] } } ---@type {[1]: number, [2]: number}[]
+
+  if #keys == 1 then
+    return res
+  end
+
+  local prev = res[1]
+  for i = 2, #keys do
+    if keys[i] <= prev[2] then
+      prev[2] = data[keys[i]]
+    else
+      prev = { keys[i], data[keys[i]] }
+      table.insert(res, prev)
+    end
+  end
+
+  return res
+end
+
+---@param buf number
 ---@param opts Opts_automark
-local function refresh(buf, start_row, end_row, opts)
+local function refresh(buf, opts)
   local prev = current_ns_key
   current_ns_key = not current_ns_key
-  mark(buf, NAMESPACES[current_ns_key], start_row, end_row, opts)
+  for _, range in pairs(get_ranges(buf)) do
+    mark(buf, NAMESPACES[current_ns_key], range[1], range[2], opts)
+  end
   unmark(buf, NAMESPACES[prev])
 end
 
@@ -158,7 +199,7 @@ function M.set_automark(buf, opts)
         end
         first_row = vim.fn.getpos("w0")[2] - 1
         last_row = vim.fn.getpos("w$")[2] - 1
-        refresh(buf, first_row, last_row, opts)
+        refresh(buf, opts)
       end)
     end,
   })
@@ -176,7 +217,7 @@ function M.set_automark(buf, opts)
         buffer = buf,
         group = vim.api.nvim_create_augroup(name_automark(buf) .. "-winscroll", {}),
         callback = function()
-          refresh(buf, first_row, last_row, opts)
+          refresh(buf, opts)
         end,
       })
     end,
