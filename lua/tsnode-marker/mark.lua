@@ -57,6 +57,31 @@ function M.mark_node(buf, node, opts)
   local lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
   local tabstop = vim.api.nvim_buf_get_option(buf, "tabstop")
   local indent = measure_node_indent(buf, node, lines, tabstop, opts)
+
+  -- update lines and range if opts.start_row and opts.end_row are provided
+  if opts.start_row then
+    if opts.start_row > range[3] then
+      return
+    end
+    if range[1] < opts.start_row then
+      range[1] = opts.start_row
+      range[2] = 0
+    end
+  end
+  if opts.end_row then
+    if opts.end_row < range[1] then
+      return
+    end
+    if opts.end_row < range[3] then
+      range[3] = opts.end_row
+      range[4] = -1
+    end
+  end
+  lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
+  if range[4] == -1 then
+    range[4] = vim.fn.strchars(lines[#lines])
+  end
+
   local priority_hl = opts.priority or 1
   local priority_vt = priority_hl + 1
   local hl_group = opts.hl_group
