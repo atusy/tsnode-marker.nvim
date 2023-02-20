@@ -8,7 +8,7 @@ Typical usecase is to change background colors of markdown code blocks.
 
 ## Install & Setup
 
-With lazy, and with an example setup to highlight markdown code blocks.
+With [folke/lazy.nvim](https://github.com/folke/lazy.nvim), and with an example setup to highlight markdown code blocks.
 
 ``` lua
 require("lazy").setup({
