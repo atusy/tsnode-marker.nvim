@@ -215,7 +215,7 @@ function M.mark_nodes_in_range(buf, opts)
   if not opts.start_row or not opts.end_row then
     opts = vim.deepcopy(opts)
     opts.start_row = opts.start_row or 0
-    opts.end_row = opts.end_row or (vim.fn.getpos("$") - 1)
+    opts.end_row = opts.end_row or (vim.fn.getpos("$")[2] - 1)
   end
   local tsnode = require("tsnode-marker.tsnode")
   local first_node = tsnode.get_first_in_range(buf, opts.start_row, opts.end_row, { lang = opts.lang })
