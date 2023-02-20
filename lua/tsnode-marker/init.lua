@@ -207,19 +207,27 @@ function M.set_automark(buf, opts)
   vim.api.nvim_create_autocmd({ "WinScrolled" }, {
     group = augroup,
     buffer = buf,
-    callback = function()
-      local prev_first, prev_last = first_row, last_row
-      first_row = vim.fn.getpos("w0")[2] - 1
-      last_row = vim.fn.getpos("w$")[2] - 1
-      mark_diff(buf, prev_first, prev_last, opts)
-      vim.api.nvim_create_autocmd("CursorHold", {
-        once = true,
-        buffer = buf,
-        group = vim.api.nvim_create_augroup(name_automark(buf) .. "-winscroll", {}),
-        callback = function()
-          refresh(buf, opts)
-        end,
-      })
+    callback = function(ctx)
+      local win = tonumber(ctx.match)
+
+      if win == nil then
+        return
+      end
+
+      vim.api.nvim_win_call(win, function()
+        local prev_first, prev_last = first_row, last_row
+        first_row = vim.fn.getpos("w0")[2] - 1
+        last_row = vim.fn.getpos("w$")[2] - 1
+        mark_diff(buf, prev_first, prev_last, opts)
+        vim.api.nvim_create_autocmd("CursorHold", {
+          once = true,
+          buffer = buf,
+          group = vim.api.nvim_create_augroup(name_automark(buf) .. "-winscroll", {}),
+          callback = function()
+            refresh(buf, opts)
+          end,
+        })
+      end)
     end,
   })
 end
