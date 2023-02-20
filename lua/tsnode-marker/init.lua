@@ -186,6 +186,7 @@ function M.set_automark(buf, opts)
     "TextChanged",
     "TextChangedI",
     "TextChangedP",
+    "BufWinEnter",
   }, {
     group = augroup,
     buffer = buf,
