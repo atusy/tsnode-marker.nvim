@@ -122,17 +122,19 @@ mark_node({buf}, {node}, {opts})
   Parameters:  
     - {buf}  Buffer handle, or 0 for current buffer
     - {node} Treesitter node
-    - {opts} Options |tsnode-marker-opts-mark|  
+    - {opts} Options (|tsnode-marker-opts-mark|). if {opts.start_row} and/or
+             {opts.end_row} are provided, mark applies on the mached part of
+             {node:range()}.
 
 
                                      *tsnode-marker.mark.mark_node_in_range()*
 mark_nodes_in_range({buf}, {opts})
   Mark nodes that matches {opts.is_target}. Target nodes are passed to
-  |tsnode-marker.mark.mark_node()|
+  |tsnode-marker.mark.mark_node()|.
 
   Parameters:  
     - {buf}  Buffer handle, or 0 for current buffer
-    - {opts} Options |tsnode-marker-opts-mark|  
+    - {opts} Options (|tsnode-marker-opts-mark|).
 
 
 ------------------------------------------------------------------------------
