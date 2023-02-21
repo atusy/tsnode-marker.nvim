@@ -37,13 +37,28 @@ end
 ---@param opts Opts_mark
 ---measures indent of a node respecting opts.indent
 local function measure_node_indent(buf, node, lines, tabstop, opts)
-  local o = opts.indent
-  if o == nil or o == "node" then
-    return require("tsnode-marker.indent").measure_common_indent(lines, tabstop)
+  if #lines == 0 then
+    return 0
   end
+
+  local o = opts.indent
+
   if type(o) == "function" then
     return o(buf, node)
   end
+
+  if o == nil or o == "node" then
+    -- if there are any characters on the left, then replace them with spaces
+    -- so to get the right width of apparent indent
+    local _, col, _, _ = node:range()
+    if col > 0 then
+      lines = { unpack(lines) }
+      local offset = vim.fn.strdisplaywidth(lines[1]:sub(1, col))
+      lines[1] = (" "):rep(offset) .. lines[1]:sub(col + 1)
+    end
+    return require("tsnode-marker.indent").measure_common_indent(lines, tabstop)
+  end
+
   return 0
 end
 
