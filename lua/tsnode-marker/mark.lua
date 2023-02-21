@@ -37,17 +37,13 @@ end
 ---@param opts Opts_mark
 ---measures indent of a node respecting opts.indent
 local function measure_node_indent(buf, node, lines, tabstop, opts)
-  if #lines == 0 then
-    return 0
-  end
-
   local o = opts.indent
 
   if type(o) == "function" then
     return o(buf, node)
   end
 
-  if o == nil or o == "node" then
+  if (o == nil or o == "node") and (#lines > 0) then
     -- if there are any characters on the left, then replace them with spaces
     -- so to get the right width of apparent indent
     local _, col, _, _ = node:range()
