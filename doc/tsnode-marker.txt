@@ -8,6 +8,7 @@ License: MIT <https://github.com/atusy/tsnode-marker.nvim/blob/main/LICENSE>
 ==============================================================================
 CONTENTS                                              *tsnode-marker-contents*
 
+INSTALL AND SETUP                        |tsnode-marker-install-and-setup|
 MODULES AND FUNCTIONS                    |tsnode-marker-modules-and-functions|
   tsnode-marker                          |tsnode-marker|
   tsnode-marker.indent                   |tsnode-marker.indent|
@@ -20,7 +21,7 @@ FUNCTION PARAMETERS                      |tsnode-marker-function-parameters|
 
 
 ==============================================================================
-INSTALL AND SETUP
+INSTALL AND SETUP                        *tsnode-marker-install-and-setup*
 
 Install and setup automatic background coloring on code blocks in Markdown
 documents with |lazy.nvim.txt| from https://github.com/folke/lazy.nvim/
