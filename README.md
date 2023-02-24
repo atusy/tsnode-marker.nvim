@@ -2,9 +2,14 @@
 
 Mark treesitter node to enhance context changes in your buffer.
 
-Typical usecase is to change background colors of markdown code blocks.
+## Demo
 
-![demo](https://user-images.githubusercontent.com/30277794/219389779-2d7d62b9-138d-451f-ad82-d46a98f81eab.png)
+Change background colors of ...
+
+- Markdown code blocks
+- Nested functions
+
+![demo](https://user-images.githubusercontent.com/30277794/221220876-3296c5e8-56c7-4ab7-9e91-e3b72340b39f.png)
 
 ## Install & Setup
 
