@@ -22,7 +22,7 @@ local function get_node(buf, start_row, end_row, opts)
       ignore_injections = opts.ignore_injections,
     })
   end
-  -- get_node_at_pos is deprecated in 0.10
+  -- get_node_at_pos is removed in 0.10
   return vim.treesitter.get_node_at_pos(buf, start_row, end_row, opts)
 end
 
