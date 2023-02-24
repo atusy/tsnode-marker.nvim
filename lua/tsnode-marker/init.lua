@@ -194,8 +194,7 @@ function M.set_automark(buf, opts)
       -- wait for parser update and avoid wrong highlights on o```<Esc>dd
       vim.schedule(function()
         -- Skip if parse fails. Otherwise, refresh can be noisy
-        local n = vim.treesitter.get_node_at_pos(buf, 0, 1, {})
-        if n ~= nil and n:root():has_error() then
+        if vim.treesitter.get_parser(buf):named_node_for_range({0, 0, -1, 0}):has_error() then
           return
         end
         first_row = vim.fn.getpos("w0")[2] - 1
