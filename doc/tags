@@ -1,9 +1,13 @@
 tsnode-marker	tsnode-marker.txt	/*tsnode-marker*
 tsnode-marker-contents	tsnode-marker.txt	/*tsnode-marker-contents*
 tsnode-marker-function-parameters	tsnode-marker.txt	/*tsnode-marker-function-parameters*
+tsnode-marker-install-and-setup	tsnode-marker.txt	/*tsnode-marker-install-and-setup*
 tsnode-marker-modules-and-functions	tsnode-marker.txt	/*tsnode-marker-modules-and-functions*
 tsnode-marker-opts-automark	tsnode-marker.txt	/*tsnode-marker-opts-automark*
 tsnode-marker-opts-mark	tsnode-marker.txt	/*tsnode-marker-opts-mark*
+tsnode-marker-recipes	tsnode-marker.txt	/*tsnode-marker-recipes*
+tsnode-marker-recipes-codeblocks	tsnode-marker.txt	/*tsnode-marker-recipes-codeblocks*
+tsnode-marker-recipes-nested-def	tsnode-marker.txt	/*tsnode-marker-recipes-nested-def*
 tsnode-marker.indent	tsnode-marker.txt	/*tsnode-marker.indent*
 tsnode-marker.indent.measure_common_indent()	tsnode-marker.txt	/*tsnode-marker.indent.measure_common_indent()*
 tsnode-marker.indent.measure_indent()	tsnode-marker.txt	/*tsnode-marker.indent.measure_indent()*
