@@ -17,6 +17,9 @@ MODULES AND FUNCTIONS                    |tsnode-marker-modules-and-functions|
 FUNCTION PARAMETERS                      |tsnode-marker-function-parameters|
   Opts_automark                          |tsnode-marker-opts-automark|
   Opts_mark                              |tsnode-marker-opts-mark|
+RECIPES                                  |tsnode-marker-recipes|
+  Marking code blocks in Markdown files  |tsnode-marker-recipes-codeblocks|
+  Marking nested functions and classes   |tsnode-marker-recipes-nested-def|
 
 
 
@@ -215,3 +218,54 @@ with following fields:
 {end_row} number
   A number indicating ending row of a range in
   |tsnode-marker.mark.mark_node_in_range()|.
+
+
+==============================================================================
+RECIPES                                  *tsnode-marker-recipes*
+
+------------------------------------------------------------------------------
+Marking code blocks in Markdown files    *tsnode-marker-recipes-codeblocks*
+
+See the section INSTALL AND SETUP (|tsnode-marker-install-and-setup|)
+
+------------------------------------------------------------------------------
+Marking nested functions and classes     *tsnode-marker-recipes-nested-def*
+
+>lua
+  local function is_def(node)
+    return vim.tbl_contains({
+      "func_literal",
+      "function_declaration",
+      "function_definition",
+      "method_declaration",
+      "method_definition",
+      "class_definition",
+    }, node:type())
+  end
+
+  vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("tsnode-marker-nested-def"),
+    pattern = { "lua", "python", "go" }, -- whatever languages you want
+    callback = function(ctx)
+      require("tsnode-marker").set_automark(ctx.buf, {
+        hl_group = "CursorLine", -- highlight group
+        target = function(_, node)
+          -- do not mark if the node does not satisfy is_def()
+          if not is_def(node) then
+            return false
+          end
+
+          -- mark if there is an ancestor node which satisfies is_def()
+          local parent = node:parent()
+          while parent do
+            if is_def(parent) then
+              return true
+            end
+            parent = parent:parent()
+          end
+          return false
+        end,
+      })
+    end,
+  })
+<
