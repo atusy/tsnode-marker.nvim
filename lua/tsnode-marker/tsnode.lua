@@ -14,6 +14,18 @@ local function is_root(buf, node)
   return false
 end
 
+local function get_node(buf, start_row, end_row, opts)
+  if vim.treesitter.get_node then
+    return vim.treesitter.get_node({
+      bufnr = buf,
+      pos = {start_row, end_row},
+      ignore_injections = opts.ignore_injections,
+    })
+  end
+  -- get_node_at_pos is deprecated in 0.10
+  return vim.treesitter.get_node_at_pos(buf, start_row, end_row, opts)
+end
+
 ---@param buf number
 ---@param start_row number
 ---@param end_row number
@@ -23,7 +35,7 @@ end
 function M.get_first_in_range(buf, start_row, end_row, opts)
   local node
   for row = start_row, end_row do
-    node = vim.treesitter.get_node_at_pos(buf, row, 0, opts) --[[@as Tsnode?]]
+    node = get_node(buf, row, 0, opts) --[[@as Tsnode?]]
     if node and not is_root(buf, node) then
       return node
     end
