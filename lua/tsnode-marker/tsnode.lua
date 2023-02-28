@@ -23,7 +23,8 @@ local function get_node(buf, start_row, end_row, opts)
     })
   end
   -- get_node_at_pos is removed in 0.10
-  return vim.treesitter.get_node_at_pos(buf, start_row, end_row, opts)
+  local ok, node = pcall(vim.treesitter.get_node_at_pos, buf, start_row, end_row, opts)
+  return ok and node or nil
 end
 
 ---@param buf number
