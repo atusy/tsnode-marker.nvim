@@ -204,6 +204,12 @@ A table with following fields:
 {lang} string | nil
   A language parser name of Treesitter.
 
+{range} fun(buf: number, node: tsnode): number, number, number, number | nil
+  A optional function to determine the range of node as a tuple of 4
+  intergers indicating start row, start column, end row, and end col.
+  If nil (default), *TSNode:range()* is used.
+
+
 ------------------------------------------------------------------------------
 Opts_mark                                *tsnode-marker-opts-mark* 
 
