@@ -6,6 +6,7 @@
 ---@field priority? number
 ---@field indent? "node" | "none" | fun(buf: number, node: Tsnode): number
 ---@field lang? string
+---@field range? fun(buf: number, node: Tsnode): number, number, number, number
 
 local M = {}
 

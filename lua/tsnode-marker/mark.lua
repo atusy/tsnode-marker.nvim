@@ -32,6 +32,17 @@ end
 
 ---@param buf number
 ---@param node Tsnode
+---@param opts Opts_mark
+---@return number, number, number, number
+local function node_range(buf, node, opts)
+  if opts.range then
+    return opts.range(buf, node)
+  end
+  return node:range()
+end
+
+---@param buf number
+---@param node Tsnode
 ---@param lines string[]
 ---@param tabstop number
 ---@param opts Opts_mark
@@ -46,7 +57,7 @@ local function measure_node_indent(buf, node, lines, tabstop, opts)
   if (o == nil or o == "node") and (#lines > 0) then
     -- if there are any characters on the left, then replace them with spaces
     -- so to get the right width of apparent indent
-    local _, col, _, _ = node:range()
+    local _, col, _, _ = node_range(buf, node, opts)
     if col > 0 then
       lines = { unpack(lines) }
       local offset = vim.fn.strdisplaywidth(lines[1]:sub(1, col))
@@ -64,7 +75,7 @@ end
 ---sets highlight group on a node respecting its indent
 ---and sets virtual text to fix apparent outdenting on blanklines
 function M.mark_node(buf, node, opts)
-  local range = { node:range() }
+  local range = { node_range(buf, node, opts) }
   local lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
   local tabstop = vim.api.nvim_buf_get_option(buf, "tabstop")
   local indent = measure_node_indent(buf, node, lines, tabstop, opts)
