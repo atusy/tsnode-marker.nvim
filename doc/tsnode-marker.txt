@@ -235,9 +235,9 @@ Marking code blocks in Markdown files    *tsnode-marker-recipes-codeblocks*
 To mark only the content of code blocks, see the section INSTALL AND SETUP
 (|tsnode-marker-install-and-setup|).
 
-To mark including fences, indent levels should be calculated manually because
-|treesitter|'s markdown parser includes extra newline to the range of the
-fenced code blocks.
+To mark including fences, a range of the mark should be calculated manually
+because |treesitter|'s markdown parser may includes extra newline which
+represents a node type called block_continuation.
 
 >lua
   vim.api.nvim_create_autocmd("FileType", {
@@ -247,13 +247,22 @@ fenced code blocks.
       require("tsnode-marker").set_automark(ctx.buf, {
         target = { "fenced_code_block" },
         hl_group = "CursorLine",
-        indent = function(buf, node)
-          -- use indent level of the first line of fenced code block
-          local row, _, _, _ = node:range()
-          return require("tsnode-marker.indent").measure_common_indent(
-            vim.api.nvim_buf_get_lines(buf, row, row + 1, true),
-            vim.bo.tabstop
-          )
+        range = function(_, node)
+          -- end_row and end_col may represent block_continuation,
+          -- which is not actually a part of fenced_code_block
+          local start_row, start_col, end_row, end_col = node:range()
+
+          -- Patch the above range with the end position of
+          -- fenced_code_block_delimiter.
+          for i = node:child_count() - 1, 2, -1 do
+            local n = node:child(i)
+            if n:type() == "fenced_code_block_delimiter" then
+              _, _, end_row, end_col = n:range()
+            end
+          end
+
+          -- Return the patched range
+          return start_row, start_col, end_row, end_col
         end,
       })
     end,
