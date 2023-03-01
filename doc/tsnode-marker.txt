@@ -226,7 +226,33 @@ RECIPES                                  *tsnode-marker-recipes*
 ------------------------------------------------------------------------------
 Marking code blocks in Markdown files    *tsnode-marker-recipes-codeblocks*
 
-See the section INSTALL AND SETUP (|tsnode-marker-install-and-setup|)
+To mark only the content of code blocks, see the section INSTALL AND SETUP
+(|tsnode-marker-install-and-setup|).
+
+To mark including fences, indent levels should be calculated manually because
+|treesitter|'s markdown parser includes extra newline to the range of the
+fenced code blocks.
+
+>lua
+  vim.api.nvim_create_autocmd("FileType", {
+    group = vim.api.nvim_create_augroup("tsnode-marker-markdown", {}),
+    pattern = "markdown",
+    callback = function(ctx)
+      require("tsnode-marker").set_automark(ctx.buf, {
+        target = { "fenced_code_block" },
+        hl_group = "CursorLine",
+        indent = function(buf, node)
+          -- use indent level of the first line of fenced code block
+          local row, _, _, _ = node:range()
+          return require("tsnode-marker.indent").measure_common_indent(
+            vim.api.nvim_buf_get_lines(buf, row, row + 1, true),
+            vim.bo.tabstop
+          )
+        end,
+      })
+    end,
+  })
+<
 
 ------------------------------------------------------------------------------
 Marking nested functions and classes     *tsnode-marker-recipes-nested-def*
