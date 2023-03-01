@@ -188,7 +188,7 @@ A table with following fields:
   String or function that indicates the applying highlight group on
   the marked regions
 
-{indent} "node" | "none" | fun(buf: number, node: tsnode): number
+{indent} "node" | "none" | fun(buf: number, node: tsnode): number | nil
   Strategies to determine indent levels of the marked regions:
     - {"none"} or nil indicates 0
     - {"node"} finds common indent width from the node
