@@ -24,10 +24,12 @@ local function mark(buf, ns, start_row, end_row, opts)
   require("tsnode-marker.mark").mark_nodes_in_range(buf, {
     target = opts.target,
     hl_group = opts.hl_group,
+    priority = opts.priority,
+    indent = opts.indent,
+    lang = opts.lang,
     namespace = ns,
     start_row = start_row,
     end_row = end_row,
-    lang = opts.lang,
   })
 end
 
