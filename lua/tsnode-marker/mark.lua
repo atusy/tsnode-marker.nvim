@@ -206,20 +206,41 @@ end
 ---@return nil
 ---marks next siblings of a node if it satisifies opts.target
 ---if the siblings overlaps with the range opts.start_row to opts.end_row
+---
+---This function internally uses node:parent():iter_children() to iterate siblings.
+---The easiest way should be using TSNode:next_sibling(), however,
+--- vim.treesitter.get_node():next_sibling():next_sibling() on
+---an opening fenced_code_block_delimiter will return block_continuation...
+---
+--- ```
+--- foo
+--- ```
+---
+---(fenced_code_block)
+---  (fenced_code_block_delimiter)
+---  (block_continuation)
+---  (code_fence_content)
+---    (block_continuation)
+---  (fenced_code_block_delimiter)
 local function mark_next_sibling(buf, node, opts)
-  local n = node
-  while true do
-    n = n:next_sibling()
-    if n == nil then
-      return
-    end
-    local range = { n:range() }
-    if range[1] <= opts.end_row then
-      local ok, hl = is_target(buf, n, opts)
-      if ok then
-        M.mark_node(buf, n, vim.tbl_extend("force", { hl_group = hl }, opts))
-      else
-        mark_children(buf, n, opts)
+  local p = node:parent()
+  if p == nil then
+    return
+  end
+  local id = node:id()
+  local skip = true
+  for n in p:iter_children() do
+    if skip then
+      skip = id ~= n:id()
+    else
+      local range = { n:range() }
+      if range[1] <= opts.end_row then
+        local ok, hl = is_target(buf, n, opts)
+        if ok then
+          M.mark_node(buf, n, vim.tbl_extend("force", { hl_group = hl }, opts))
+        else
+          mark_children(buf, n, opts)
+        end
       end
     end
   end
