@@ -171,12 +171,7 @@ function M.set_automark(buf, opts)
   local first_row = vim.fn.getpos("w0")[2] - 1
   local last_row = vim.fn.getpos("w$")[2] - 1
   clear_namespaces(buf)
-  vim.schedule(
-    -- make sure callback is evaluated after captures are available
-    function()
-      mark(buf, NAMESPACES[current_ns_key], first_row, last_row, opts)
-    end
-  )
+  mark(buf, NAMESPACES[current_ns_key], first_row, last_row, opts)
 
   local augroup = vim.api.nvim_create_augroup(name_automark(buf), {})
 
