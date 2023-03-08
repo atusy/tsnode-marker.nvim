@@ -36,28 +36,25 @@ local function unmark(buf, namespace)
 end
 
 ---@param buf number
----@param start_row number
----@param end_row number
+---@param prev_first number
+---@param prev_last number
 ---@param opts Opts_automark
 ---Mark on lines not yet evaluated
-local function mark_diff(buf, start_row, end_row, opts)
-  local first_row = vim.fn.getpos("w0")[2] - 1
-  local last_row = vim.fn.getpos("w$")[2] - 1
-
+local function mark_diff(buf, prev_first, prev_last, cur_first, cur_last, opts)
   -- WinScrolled event applies on pagewise scroll
-  if (first_row > end_row) or (last_row < start_row) then
-    mark(buf, NAMESPACES[current_ns_key], first_row, last_row, opts)
+  if (cur_first > prev_last) or (cur_last < prev_first) then
+    mark(buf, NAMESPACES[current_ns_key], cur_first, cur_last, opts)
     return
   end
 
   -- WinScrolled event applies on linewise scroll up or resize
-  if first_row < start_row then
-    mark(buf, NAMESPACES[current_ns_key], first_row, start_row - 1, opts)
+  if cur_first < prev_first then
+    mark(buf, NAMESPACES[current_ns_key], cur_first, prev_first - 1, opts)
   end
 
   -- WinScrolled event applies on linewise scroll down or resize
-  if last_row > end_row then
-    mark(buf, NAMESPACES[current_ns_key], end_row + 1, last_row, opts)
+  if cur_last > prev_last then
+    mark(buf, NAMESPACES[current_ns_key], prev_last + 1, cur_last, opts)
   end
 end
 
@@ -211,7 +208,7 @@ function M.set_automark(buf, opts)
         local prev_first, prev_last = first_row, last_row
         first_row = vim.fn.getpos("w0")[2] - 1
         last_row = vim.fn.getpos("w$")[2] - 1
-        mark_diff(buf, prev_first, prev_last, opts)
+        mark_diff(buf, prev_first, prev_last, first_row, last_row, opts)
         vim.api.nvim_create_autocmd("CursorHold", {
           once = true,
           buffer = buf,
