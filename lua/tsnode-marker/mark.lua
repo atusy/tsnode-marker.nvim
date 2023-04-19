@@ -101,7 +101,7 @@ function M.mark_node(buf, node, opts)
   end
   lines = vim.api.nvim_buf_get_lines(buf, range[1], range[3] + 1, false)
   if range[4] == -1 then
-    range[4] = vim.fn.strchars(lines[#lines])
+    range[4] = #(lines[#lines])
   end
 
   local priority_hl = opts.priority or 1
