@@ -183,6 +183,9 @@ function M.set_automark(buf, opts)
     callback = function()
       -- wait for parser update and avoid wrong highlights on o```<Esc>dd
       vim.schedule(function()
+        if not vim.api.nvim_buf_is_valid(buf) then
+          return
+        end
         -- Skip if parse fails. Otherwise, refresh can be noisy
         local trees = vim.treesitter.get_parser(buf):trees()
         if trees[1] == nil or trees[1]:root():has_error() then
